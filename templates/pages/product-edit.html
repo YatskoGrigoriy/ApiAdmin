@@ -1,0 +1,114 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="content-header">
+
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-10 offset-sm-1">
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Редагувати</h3>
+                    </div>
+                    <div class="card-body">
+                         {%for i in product %}
+                        <form action="/product-edit-add={{i.id}}" enctype="multipart/form-data" method="post" role="form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i> Назва товару
+                                        </label>
+                                        <input class="form-control is-warning" value="{{i.name}}" name="name" placeholder="Enter ..." type="text">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i> Ціна
+                                        </label>
+                                        <input class="form-control is-warning" value="{{i.price}}" name="price" placeholder="Enter ..." type="text">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i>Знижка
+                                        </label>
+                                        <input class="form-control is-warning" value="{{i.discount}}" name="discount" placeholder="Enter ..." type="text">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group" data-select2-id="48">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i>Група
+                                        </label>
+                                        <select aria-hidden="true"
+                                                class="form-control select2 select2-hidden-accessible  is-warning"
+                                                value="{{i.group_id}}"
+                                                name="group_id"
+                                                style="width: 100%;"
+                                                tabindex="-1">
+                                             <option selected="selected" disabled="disabled">...</option>
+                                            {%for group in products_group %}
+                                            <option value="{{group.id}}">{{group.tag}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-12">
+
+                                      <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i>Зображення
+                                        </label>
+                                        <input class="form-control is-warning"
+                                               value="{{i.img}}"
+                                               name="img"
+                                               placeholder="Enter ..."
+                                               type="file">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Короткий Опис Товару <span>(150)</span></label>
+                                                <textarea class="form-control" maxlength="99"
+                                                          name="short_description"
+                                                          placeholder="Enter ..." rows="2">
+                                                    {{i.short_description|safe}}
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Детальний Опис Товару</label>
+                                                <textarea class="form-control"
+                                                          name="description"
+                                                          placeholder="Enter ..."
+                                                          rows="6">
+                                                    {{i.description|safe}}
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button class="btn btn-block btn-info">Внести</button>
+                                </div>
+                            </div>
+                        </form>
+                         {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

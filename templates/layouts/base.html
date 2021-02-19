@@ -1,0 +1,44 @@
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    {% if title %}
+    <title>{{ title }} - AdminGolden</title>
+    {% else %}
+    <title>Welcome to AdminGolden</title>
+    {% endif %}
+    {% include 'layouts/style.html' %}
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- Navbar -->
+{% include 'layouts/header.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        {% block content %}
+
+        {% endblock %}
+
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <!-- Main Footer -->
+{% include 'layouts/footer.html' %}
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+{% include 'layouts/script.html' %}
+</body>
+</html>
+
+
+
+
+
+
+
+

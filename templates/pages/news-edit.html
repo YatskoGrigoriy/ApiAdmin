@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="content-header">
+
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-10 offset-sm-1">
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Редагувати</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for i in news %}
+                        <form action="/news-edit-add={{i.id}}" enctype="multipart/form-data" method="post" role="form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i> Заголовок
+                                        </label>
+                                        <input class="form-control is-warning" name="title"
+                                               placeholder="Enter ..."
+                                               type="text"
+                                               value="{{i.title}}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+
+                                            <input class="form-control is-warning custom-file-input" name="img"
+                                                   type="file">
+                                            <label class="custom-file-label" for="customFile">зображення</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Короткий Опис <span>(150)</span></label>
+                                                <textarea class="form-control" name="short_text"
+                                                           maxlength="140"
+                                                          placeholder="Enter ..." rows="3">
+                                                    {{i.short_text|safe}}
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Детальний Опис</label>
+                                                <textarea class="form-control" name="text"
+                                                          placeholder="Enter ..."
+                                                          rows="3">
+                                                    {{i.text|safe}}
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button class="btn btn-block btn-info">Внести</button>
+                                </div>
+                            </div>
+                        </form>
+                        {%endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

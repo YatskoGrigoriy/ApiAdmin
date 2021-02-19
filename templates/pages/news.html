@@ -1,0 +1,156 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Новини</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Додати</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/news-add" enctype="multipart/form-data" method="post" role="form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i> Заголовок
+                                        </label>
+                                        <input class="form-control is-warning" name="title" placeholder="Enter ..."
+                                               type="text">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+
+                                            <input class="form-control is-warning custom-file-input" name="img"
+                                                   type="file">
+                                            <label class="custom-file-label" for="customFile">зображення</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Короткий Опис <span>(150)</span></label>
+                                                <textarea class="form-control" maxlength="140" name="short_text"
+                                                          placeholder="Enter ..." rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>Детальний Опис</label>
+                                                <textarea class="form-control" name="text"
+                                                          placeholder="Enter ..."
+                                                          rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button class="btn btn-block btn-info">Внести</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Новини</h3>
+
+                        <div class="card-tools">
+                            <button class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                                    title="Collapse"
+                                    type="button">
+                                <i class="fas fa-minus"></i></button>
+                            <button class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove"
+                                    type="button">
+                                <i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0" style="height:600px;">
+                        <table class="table  table-hover text-nowrap projects">
+                            <thead>
+                            <tr>
+                                <th>Керування</th>
+
+                                <th style="width: 20%">
+                                    Заголовок
+                                </th>
+                                <th style="width: 20%">
+                                    Короткий Опис
+                                </th>
+
+                                <th style="width: 30%">
+                                    Зображення
+                                </th>
+
+                                <th style="width: 1%">
+                                    id
+                                </th>
+                            </tr>
+                            </thead>
+                            {% for i in news %}
+                            <tbody>
+                            <tr>
+
+                                <td class="project-actions text-right">
+                                    <a class="btn btn-info btn-sm" href="/news-edit={{i.id}}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a class="btn btn-danger btn-sm" href="/news-delete={{i.id}}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <small>
+                                        {{i.title}}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small>
+                                        {{i.short_text}}
+                                    </small>
+                                </td>
+                            
+                                <td>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <img alt="Avatar" class="table-avatar" src="{{i.img}}">
+                                        </li>
+                                    </ul>
+                                </td>
+
+
+                                <td>
+                                    {{i.id}}
+                                </td>
+
+                            </tr>
+                            </tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
