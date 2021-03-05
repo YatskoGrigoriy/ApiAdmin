@@ -1,13 +1,17 @@
 import os
-from flask import Flask, render_template, url_for, redirect, request, session, request,jsonify
-from flask_wtf.csrf import CSRFProtect
+from datetime import datetime
+import requests
+from flask import Flask, render_template, url_for, redirect, session, request, jsonify
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['WTF_CSRF_ENABLED'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://grin:fgolden1306!@localhost/goldennet'
 app.config['SECRET_KEY'] = '12345'
 app.config['SECURITY_PASSWORD_SALT'] = 'salt'
@@ -22,7 +26,7 @@ ma = Marshmallow(app)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 from models import *
 
-ALLOWED_EXTENSIONS = set(['ico','txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp'])
+ALLOWED_EXTENSIONS = set(['ico', 'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp'])
 
 
 def allowed_file(filename):
@@ -35,7 +39,7 @@ def admin():
     return render_template('index.html')
 
 
-@app.route("/product-add-group",methods = ['POST'])
+@app.route("/product-add-group", methods=['POST'])
 def product_add_group():
     group = request.form.get('group')
 
@@ -52,7 +56,8 @@ def product_delete_group(id):
     db.session.commit()
     return redirect('/product')
 
-#SITE_PODUCT_GROUP_API
+
+# SITE_PODUCT_GROUP_API
 @app.route('/api/group-list/p')
 def group_json():
     group = ProductGroup.query.all()
@@ -65,9 +70,10 @@ def group_json():
 def product():
     products = Product.query.all()
     products_group = ProductGroup.query.all()
-    return render_template('pages/product.html', products=products,products_group=products_group)
+    return render_template('pages/product.html', products=products, products_group=products_group)
 
-@app.route("/product-add",methods = ['POST'])
+
+@app.route("/product-add", methods=['POST'])
 def product_add():
     name = request.form.get('name')
     description = request.form.get('description')
@@ -82,22 +88,25 @@ def product_add():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            p = Product(name=name,description=description,short_description=short_description,
-                        price=price,discount=discount, group_id= group_id,img='https://mag.golden.net.ua/static/shop_img/' + filename)
+            p = Product(name=name, description=description, short_description=short_description,
+                        price=price, discount=discount, group_id=group_id,
+                        img='https://mag.golden.net.ua/static/shop_img/' + filename)
             db.session.add(p)
             db.session.commit()
         else:
-            p = Product(name=name,description=description,short_description=short_description,
-                        price=price,discount=discount, group_id= group_id)
+            p = Product(name=name, description=description, short_description=short_description,
+                        price=price, discount=discount, group_id=group_id)
             db.session.add(p)
             db.session.commit()
     return redirect('/product')
+
 
 @app.route('/product-edit=<int:id>')
 def product_edit(id):
     products_group = ProductGroup.query.all()
     product = Product.query.filter(Product.id == id)
-    return render_template('pages/product-edit.html',  products_group=products_group, product=product)
+    return render_template('pages/product-edit.html', products_group=products_group, product=product)
+
 
 @app.route("/product-edit-add=<int:id>", methods=['POST'])
 def product_edit_add(id):
@@ -134,7 +143,7 @@ def product_delete(id):
     return redirect('/product')
 
 
-#SITE_PRODUCT_API
+# SITE_PRODUCT_API
 @app.route('/api/product-list/p')
 def product_json():
     product = Product.query.all()
@@ -142,14 +151,15 @@ def product_json():
     output = product_schema.dump(product)
     return jsonify({'products': output})
 
-#SITE_PRODUCT_API+GROUP
+
+# SITE_PRODUCT_API+GROUP
 @app.route('/api/product-list/pg')
 def product_pg_json():
-    product = db.session.query(Product.name,  Product.img, Product.description, \
-         Product.short_description, Product.price,  Product.discount, ProductGroup.tag) \
+    product = db.session.query(Product.name, Product.img, Product.description, \
+                               Product.short_description, Product.price, Product.discount, ProductGroup.tag) \
         .outerjoin(ProductGroup, Product.group_id == ProductGroup.id)
     product_schema = ProductSchema(many=True)
-    a ={}
+    a = {}
     for p in product:
         a.update(p)
     # data, errors =  product_schema.dump([{'name': x[0], 'img': x[1],\
@@ -159,14 +169,14 @@ def product_pg_json():
     return jsonify({'products': data})
 
 
-
-#NEWS
+# NEWS
 @app.route("/news")
 def news():
     news = News.query.all()
     return render_template('pages/news.html', news=news)
 
-@app.route("/news-add",methods = ['POST'])
+
+@app.route("/news-add", methods=['POST'])
 def news_add():
     title = request.form.get('title')
     text = request.form.get('text')
@@ -180,7 +190,7 @@ def news_add():
             file.save(os.path.join(app.config['UPLOAD_FOLDER_NEWS'], filename))
 
             n = News(title=title, text=text, short_text=short_text,
-                        img='https://mag.golden.net.ua/static/news_img/' + filename)
+                     img='https://mag.golden.net.ua/static/news_img/' + filename)
             db.session.add(n)
             db.session.commit()
         else:
@@ -189,10 +199,12 @@ def news_add():
             db.session.commit()
     return redirect('/news')
 
+
 @app.route('/news-edit=<int:id>')
 def news_edit(id):
     news = News.query.filter(News.id == id)
     return render_template('pages/news-edit.html', news=news)
+
 
 @app.route("/news-edit-add=<int:id>", methods=['POST'])
 def news_edit_add(id):
@@ -216,13 +228,15 @@ def news_edit_add(id):
 
     return redirect(url_for('news'))
 
+
 @app.route("/news-delete=<int:id>")
 def news_delete(id):
     n = News.query.filter(News.id == id).delete()
     db.session.commit()
     return redirect('/news')
 
-#SITE_NEWS_API
+
+# SITE_NEWS_API
 @app.route('/api/news-list/p')
 def news_json():
     news = News.query.all()
@@ -230,7 +244,8 @@ def news_json():
     output = news_schema.dump(news)
     return jsonify({'news': output})
 
-#SITE_NEWS_API_FILTER
+
+# SITE_NEWS_API_FILTER
 @app.route('/api/news-one-filter-list/p=<int:id>')
 def news_filter_json(id):
     news = News.query.filter(News.id == id).first()
@@ -238,12 +253,40 @@ def news_filter_json(id):
     output = news_schema.dump(news)
     return jsonify({'news': output})
 
+#GENERATE_SCRF_TOKEN
+@app.route('/api/csrf/cookie', methods=['GET'])
+def token():
+    res = {'csrfToken': generate_csrf()}
+    return jsonify(res)
 
+# QUESTION_API
+@app.route('/api/question', methods=['POST'])
+def question_api():
+    # GetFormData
+    FormData = request.get_json()
 
+    # GetTime
+    now = datetime.now()
+    dt_string = str(now.strftime("%d.%m.%Y %H:%M:%S"))
 
+    # ReSendPost
+    url = 'https://apiv2.golden.net.ua/v2/private/customers/question'
+    headers = {
+        'Content-type': 'application/json',
+        'X-Auth-Key': '697d2532-4c71-4e64-b9c3-a203e9af03e4'
+    }
 
+    json = {
+        "agreement_id": 11988,
+        "reason_id": 12,
+        "phone": FormData['phone'],
+        "destination_time": dt_string,
+        "comment": '\n' + 'Звернення: ' + FormData['name'] + '\n' + 'Причина: ' + FormData['message']
+    }
 
-
+    response = requests.post(url, json=json, headers=headers)
+    print(response.text)
+    return ""
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
