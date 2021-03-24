@@ -20,7 +20,7 @@ app.config['UPLOAD_FOLDER'] = '/www/goldennet/Admin/static/shop_img'
 app.config['SHOP_GROUP_FOLDER'] = '/www/goldennet/Admin/static/shop_group_img'
 app.config['UPLOAD_FOLDER_NEWS'] = '/www/goldennet/Admin/static/news_img'
 
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 csrf = CSRFProtect(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -58,7 +58,7 @@ def add_group():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['SHOP_GROUP_FOLDER'], filename))
             pg = ParentGroup(name=name,
-                         img='https://mag.golden.net.ua/static/shop_group_img/' + filename)
+                             img='https://mag.golden.net.ua/static/shop_group_img/' + filename)
             db.session.add(pg)
             db.session.commit()
         else:
@@ -333,6 +333,20 @@ def question_api():
     response = requests.post(url, json=json, headers=headers)
     print(response.text)
     return ""
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return '<h1 style="text-align:center;color:red;">Error 404 , Страница не найдена;)<h1/>' \
+           '<p style="text-align:center;">Текст ошибки :</p>'+  '<p style="text-align:center;">' + str(e) + '<p/>'\
+           '<br> <p style="text-align:center;">Обратитесь к администратору</p> <br>'
+
+
+@app.errorhandler(500)
+def server_error(e):
+    return '<h1 style="text-align:center;color:red;">Error 500 , Ошибка сервера;)<h1/>' \
+           '<p style="text-align:center;">Текст ошибки :</p>'+  '<p style="text-align:center;">' + str(e) + '<p/>'\
+           '<br> <p style="text-align:center;">Обратитесь к администратору</p> <br>'
 
 
 if __name__ == "__main__":
