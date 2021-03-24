@@ -319,7 +319,7 @@ def question_api():
     url = 'https://apiv2.golden.net.ua/v2/private/customers/question'
     headers = {
         'Content-type': 'application/json',
-        'X-Auth-Key': '697d2532-4c71-4e64-b9c3-a203e9af03e4'
+        'X-Auth-Key': key
     }
 
     json = {
