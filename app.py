@@ -17,6 +17,7 @@ app.config['SECRET_KEY'] = '12345'
 app.config['SECURITY_PASSWORD_SALT'] = 'salt'
 app.config['SECURITY_PASSWORD_HASH'] = 'sha256_crypt'
 app.config['UPLOAD_FOLDER'] = '/www/goldennet/Admin/static/shop_img'
+app.config['SHOP_GROUP_FOLDER'] = '/www/goldennet/Admin/static/shop_group_img'
 app.config['UPLOAD_FOLDER_NEWS'] = '/www/goldennet/Admin/static/news_img'
 
 app.config['DEBUG'] = True
@@ -33,28 +34,39 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-#Home
+
+# Home
 @app.route('/')
 def admin():
     return render_template('index.html')
 
-#Group
+
+# Group
 @app.route('/main-group')
 def main_group():
     parent_group = ParentGroup.query.all()
     sub_group = SubGroup.query.all()
     return render_template('pages/group-add.html', parent_group=parent_group, sub_group=sub_group)
 
+
 @app.route("/add-main-group", methods=['POST'])
 def add_group():
     name = request.form.get('name')
-
-    pg = ParentGroup(name=name)
-    db.session.add(pg)
-    db.session.commit()
+    if request.method == 'POST':
+        file = request.files['img']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['SHOP_GROUP_FOLDER'], filename))
+            pg = ParentGroup(name=name,
+                         img='https://mag.golden.net.ua/static/shop_group_img/' + filename)
+            db.session.add(pg)
+            db.session.commit()
+        else:
+            pg = ParentGroup(name=name)
+            db.session.add(pg)
+            db.session.commit()
 
     return redirect('/main-group')
-
 
 
 @app.route("/delete-parent-group=<int:id>")
@@ -64,16 +76,24 @@ def delete_parent_group(id):
     return redirect('/main-group')
 
 
-
-#subGroup
+# subGroup
 @app.route("/add-sub-group", methods=['POST'])
 def product_add_sub_group():
     p_name = request.form.get('p_name')
     p_id = request.form.get('p_id')
-
-    p = SubGroup(tag=p_name,parent_id=p_id)
-    db.session.add(p)
-    db.session.commit()
+    if request.method == 'POST':
+        file = request.files['img']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['SHOP_GROUP_FOLDER'], filename))
+            p = SubGroup(tag=p_name, parent_id=p_id,
+                         img='https://mag.golden.net.ua/static/shop_group_img/' + filename)
+            db.session.add(p)
+            db.session.commit()
+        else:
+            p = SubGroup(tag=p_name, parent_id=p_id)
+            db.session.add(p)
+            db.session.commit()
 
     return redirect('/main-group')
 
@@ -85,8 +105,7 @@ def delete_sub_group(id):
     return redirect('/main-group')
 
 
-
-#Product
+# Product
 @app.route('/product')
 def product():
     products = Product.query.all()
@@ -164,6 +183,7 @@ def product_delete(id):
     db.session.commit()
     return redirect('/product')
 
+
 # NEWS
 @app.route("/news")
 def news():
@@ -231,11 +251,9 @@ def news_delete(id):
     return redirect('/news')
 
 
+# API
 
-
-#API
-
-#GROUP-LIST
+# GROUP-LIST
 @app.route('/api/main-group-list/p')
 def main_group_json():
     group = ParentGroup.query.all()
@@ -244,13 +262,14 @@ def main_group_json():
     return jsonify({'data': output})
 
 
-#SUB-GROUP-LIST
+# SUB-GROUP-LIST
 @app.route('/api/sub-group-list/p=<int:id>')
 def sub_group_json(id):
     group = SubGroup.query.filter(SubGroup.parent_id == id)
     group_schema = SubGroupSchema(many=True)
     output = group_schema.dump(group)
     return jsonify({'data': output})
+
 
 # SITE_PODUCT_GROUP_API
 @app.route('/api/product-list/p=<int:id>')
@@ -259,8 +278,6 @@ def product_json(id):
     product_schema = ProductSchema(many=True)
     output = product_schema.dump(product)
     return jsonify({'data': output})
-
-
 
 
 # SITE_NEWS_API
@@ -280,11 +297,13 @@ def news_filter_json(id):
     output = news_schema.dump(news)
     return jsonify({'data': output})
 
-#GENERATE_SCRF_TOKEN
+
+# GENERATE_SCRF_TOKEN
 @app.route('/api/csrf/cookie', methods=['GET'])
 def token():
     res = {'csrfToken': generate_csrf()}
     return jsonify(res)
+
 
 # QUESTION_API
 @app.route('/api/question', methods=['POST'])
@@ -314,6 +333,7 @@ def question_api():
     response = requests.post(url, json=json, headers=headers)
     print(response.text)
     return ""
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

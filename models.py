@@ -5,6 +5,7 @@ from datetime import datetime
 class ParentGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
+    img = db.Column(db.String(100))
 
     def __repr__(self):
         return '<ParentGroup id: {}, name: {}>'.format(self.id, self.name)
@@ -13,6 +14,7 @@ class ParentGroup(db.Model):
 class SubGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag = db.Column(db.String(200))
+    img = db.Column(db.String(100))
     parent_id = db.Column(db.Integer, db.ForeignKey('parent_group.id', ondelete='CASCADE'))
 
 
