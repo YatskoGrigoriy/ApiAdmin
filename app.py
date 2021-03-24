@@ -33,44 +33,66 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+#Home
 @app.route('/')
 def admin():
     return render_template('index.html')
 
+#Group
+@app.route('/main-group')
+def main_group():
+    parent_group = ParentGroup.query.all()
+    sub_group = SubGroup.query.all()
+    return render_template('pages/group-add.html', parent_group=parent_group, sub_group=sub_group)
 
-@app.route("/product-add-group", methods=['POST'])
-def product_add_group():
-    group = request.form.get('group')
+@app.route("/add-main-group", methods=['POST'])
+def add_group():
+    name = request.form.get('name')
 
-    pg = ProductGroup(tag=group)
+    pg = ParentGroup(name=name)
     db.session.add(pg)
     db.session.commit()
 
-    return redirect('/product')
+    return redirect('/main-group')
 
 
-@app.route("/product-delete-group=<int:id>")
-def product_delete_group(id):
-    pdg = ProductGroup.query.filter(ProductGroup.id == id).delete()
+
+@app.route("/delete-parent-group=<int:id>")
+def delete_parent_group(id):
+    ParentGroup.query.filter(ParentGroup.id == id).delete()
     db.session.commit()
-    return redirect('/product')
+    return redirect('/main-group')
 
 
-# SITE_PODUCT_GROUP_API
-@app.route('/api/group-list/p')
-def group_json():
-    group = ProductGroup.query.all()
-    group_schema = ProductGroupSchema(many=True)
-    output = group_schema.dump(group)
-    return jsonify({'group': output})
+
+#subGroup
+@app.route("/add-sub-group", methods=['POST'])
+def product_add_sub_group():
+    p_name = request.form.get('p_name')
+    p_id = request.form.get('p_id')
+
+    p = SubGroup(tag=p_name,parent_id=p_id)
+    db.session.add(p)
+    db.session.commit()
+
+    return redirect('/main-group')
 
 
+@app.route("/delete-sub-group=<int:id>")
+def delete_sub_group(id):
+    SubGroup.query.filter(SubGroup.id == id).delete()
+    db.session.commit()
+    return redirect('/main-group')
+
+
+
+#Product
 @app.route('/product')
 def product():
     products = Product.query.all()
-    products_group = ProductGroup.query.all()
-    return render_template('pages/product.html', products=products, products_group=products_group)
+    parent_group = ParentGroup.query.all()
+    sub_group = SubGroup.query.all()
+    return render_template('pages/product.html', parent_group=parent_group, sub_group=sub_group, products=products)
 
 
 @app.route("/product-add", methods=['POST'])
@@ -103,7 +125,7 @@ def product_add():
 
 @app.route('/product-edit=<int:id>')
 def product_edit(id):
-    products_group = ProductGroup.query.all()
+    products_group = SubGroup.query.all()
     product = Product.query.filter(Product.id == id)
     return render_template('pages/product-edit.html', products_group=products_group, product=product)
 
@@ -141,33 +163,6 @@ def product_delete(id):
     pdg = Product.query.filter(Product.id == id).delete()
     db.session.commit()
     return redirect('/product')
-
-
-# SITE_PRODUCT_API
-@app.route('/api/product-list/p')
-def product_json():
-    product = Product.query.all()
-    product_schema = ProductSchema(many=True)
-    output = product_schema.dump(product)
-    return jsonify({'products': output})
-
-
-# SITE_PRODUCT_API+GROUP
-@app.route('/api/product-list/pg')
-def product_pg_json():
-    product = db.session.query(Product.name, Product.img, Product.description, \
-                               Product.short_description, Product.price, Product.discount, ProductGroup.tag) \
-        .outerjoin(ProductGroup, Product.group_id == ProductGroup.id)
-    product_schema = ProductSchema(many=True)
-    a = {}
-    for p in product:
-        a.update(p)
-    # data, errors =  product_schema.dump([{'name': x[0], 'img': x[1],\
-    # 'description': x[2], 'short_description': x[3],'price': x[4], 'discount': x[5]} for x in product])
-    # output = product_schema.dump(errors)
-    print(a)
-    return jsonify({'products': data})
-
 
 # NEWS
 @app.route("/news")
@@ -236,13 +231,45 @@ def news_delete(id):
     return redirect('/news')
 
 
+
+
+#API
+
+#GROUP-LIST
+@app.route('/api/main-group-list/p')
+def main_group_json():
+    group = ParentGroup.query.all()
+    group_schema = ParentGroupSchema(many=True)
+    output = group_schema.dump(group)
+    return jsonify({'data': output})
+
+
+#SUB-GROUP-LIST
+@app.route('/api/sub-group-list/p=<int:id>')
+def sub_group_json(id):
+    group = SubGroup.query.filter(SubGroup.parent_id == id)
+    group_schema = SubGroupSchema(many=True)
+    output = group_schema.dump(group)
+    return jsonify({'data': output})
+
+# SITE_PODUCT_GROUP_API
+@app.route('/api/product-list/p=<int:id>')
+def product_json(id):
+    product = Product.query.filter(Product.group_id == id)
+    product_schema = ProductSchema(many=True)
+    output = product_schema.dump(product)
+    return jsonify({'data': output})
+
+
+
+
 # SITE_NEWS_API
 @app.route('/api/news-list/p')
 def news_json():
     news = News.query.all()
     news_schema = NewsSchema(many=True)
     output = news_schema.dump(news)
-    return jsonify({'news': output})
+    return jsonify({'data': output})
 
 
 # SITE_NEWS_API_FILTER
@@ -251,7 +278,7 @@ def news_filter_json(id):
     news = News.query.filter(News.id == id).first()
     news_schema = NewsSchema()
     output = news_schema.dump(news)
-    return jsonify({'news': output})
+    return jsonify({'data': output})
 
 #GENERATE_SCRF_TOKEN
 @app.route('/api/csrf/cookie', methods=['GET'])

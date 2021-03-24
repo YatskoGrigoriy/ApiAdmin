@@ -1,0 +1,156 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">1</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-sm-4">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Група</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/add-main-group" enctype="multipart/form-data" method="post" role="form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i> Назва групи
+                                        </label>
+                                        <input class="form-control is-warning" name="name" placeholder="Enter ..."
+                                               type="text">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+
+                                            <input class="form-control is-warning custom-file-input" name="img"
+                                                   type="file">
+                                            <label class="custom-file-label" for="customFile">Додати зображення</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button class="btn btn-block btn-primary">Внести</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-4">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Підгрупа</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/add-sub-group" enctype="multipart/form-data" method="post" role="form">
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <div class="form-group" data-select2-id="48">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i>Назва групи
+                                        </label>
+                                        <select aria-hidden="true"
+                                                class="form-control select2 select2-hidden-accessible  is-warning"
+                                                name="p_id"
+                                                style="width: 100%;"
+                                                tabindex="-1">
+                                            <option selected="selected" disabled value="">...</option>
+                                            {%for i in parent_group %}
+                                            <option value="{{i.id}}">{{i.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-12">
+                                    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <label class="col-form-label" for="inputWarning">
+                                            <i class="far fa-bell"></i> Назва підгрупи
+                                        </label>
+                                        <input class="form-control is-warning" name="p_name" placeholder="Enter ..."
+                                               type="text">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+
+                                            <input class="form-control is-warning custom-file-input" name="img"
+                                                   type="file">
+                                            <label class="custom-file-label" for="customFile">Додати зображення</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-block btn-primary">Внести</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Групи Підгрупи</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0" style="height: 400px;">
+
+                        <table class="table table-head-fixed text-nowrap">
+                            <thead>
+                            <tr>
+                                <th>Назва</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {%for p in parent_group %}
+                            <tr>
+                                <td>
+                                    <a class="btn btn-danger btn-sm" href="/delete-parent-group={{p.id}}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    {{p.name}}
+                                    {%for s in sub_group %}
+                                    {% if p.id == s.parent_id %}
+                                    <ul>
+
+                                        <li>
+
+                                            <a class="btn btn-danger btn-xs" href="/delete-sub-group={{s.id}}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            {{ s.tag }}
+                                        </li>
+
+                                    </ul>
+                                    {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}

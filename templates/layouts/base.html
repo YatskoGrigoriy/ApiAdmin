@@ -10,12 +10,14 @@
     {% include 'layouts/style.html' %}
 </head>
 <body class="hold-transition sidebar-mini">
+
 <div class="wrapper">
     <!-- Navbar -->
 {% include 'layouts/header.html' %}
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
+
         {% block content %}
 
         {% endblock %}
@@ -25,12 +27,12 @@
 
 
     <!-- Main Footer -->
-{% include 'layouts/footer.html' %}
+
 </div>
 <!-- ./wrapper -->
 
 <!-- REQUIRED SCRIPTS -->
-
+{% include 'layouts/footer.html' %}
 {% include 'layouts/script.html' %}
 </body>
 </html>

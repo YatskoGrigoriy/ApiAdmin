@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0">Перелік товару</h1>
+                <h1 class="m-0">2</h1>
             </div>
         </div>
     </div>
@@ -12,8 +12,8 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-4">
-                <div class="card card-warning">
+            <div class="col-sm-7">
+                <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Додати товар</h3>
                     </div>
@@ -30,7 +30,7 @@
                                                type="text">
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-3">
                                     <div class="form-group">
                                         <label class="col-form-label" for="inputWarning">
                                             <i class="far fa-bell"></i> Ціна
@@ -39,7 +39,7 @@
                                                type="text">
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-3">
                                     <div class="form-group">
                                         <label class="col-form-label" for="inputWarning">
                                             <i class="far fa-bell"></i>Знижка
@@ -48,19 +48,26 @@
                                                type="text">
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-6">
                                     <div class="form-group" data-select2-id="48">
                                         <label class="col-form-label" for="inputWarning">
-                                            <i class="far fa-bell"></i>Група
+                                            <i class="far fa-bell"></i>Підгрупа
                                         </label>
                                         <select aria-hidden="true"
                                                 class="form-control select2 select2-hidden-accessible  is-warning"
                                                 name="group_id"
                                                 style="width: 100%;"
                                                 tabindex="-1">
-                                            {%for i in products_group %}
-                                            <option selected="selected" value="{{i.id}}">{{i.tag}}</option>
+                                            <option selected="selected" disabled>...</option>
+                                            {%for p in parent_group -%}
+
+                                            {%for s in sub_group -%}
+                                            {% if p.id == s.parent_id -%}
+                                            <option  value="{{s.id}}">{{p.name}} - {{s.tag}}</option>
+                                            {% endif %}
                                             {% endfor %}
+                                            {% endfor %}
+
                                         </select>
                                     </div>
 
@@ -97,68 +104,16 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button class="btn btn-block btn-info">Внести</button>
+                                    <button class="btn btn-block btn-primary">Внести</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-2">
-                <div class="card card-warning">
-                    <div class="card-header">
-                        <h3 class="card-title">Додати групу</h3>
-                    </div>
-                    <div class="card-body">
-                        <form action="/product-add-group" enctype="multipart/form-data" method="post" role="form">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <div class="form-group">
-                                        <label class="col-form-label" for="inputWarning">
-                                            <i class="far fa-bell"></i> Назва групи
-                                        </label>
-                                        <input class="form-control is-warning" name="group" placeholder="Enter ..."
-                                               type="text">
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <button class="btn btn-block btn-info">Внести</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="card card-danger">
-                    <div class="card-header">
-                        <h3 class="card-title">Видалити групу</h3>
-                    </div>
-                    <div class="card-body table-responsive p-0" style="height: 350px;">
-                        <table class="table table-head-fixed text-nowrap">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Група</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {%for i in products_group %}
-                            <tr>
-                                <td>
-                                    <a class="btn btn-danger btn-sm" href="/product-delete-group={{i.id}}">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
-                                <td>{{i.tag}}</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="card card-warning">
+
+            <div class="col-sm-5">
+                <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Товар</h3>
 
@@ -203,7 +158,7 @@
                             <tbody>
                             <tr>
                                 <td class="project-actions text-right">
-                                    <a class="btn btn-info btn-sm" href="/product-edit={{i.id}}">
+                                    <a class="btn btn-primary btn-sm" href="/product-edit={{i.id}}">
                                         <i class="far fa-edit"></i>
                                     </a>
                                     <a class="btn btn-danger btn-sm" href="/product-delete={{i.id}}">
